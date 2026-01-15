@@ -57,6 +57,31 @@ OPENAI_API_KEY=your_openai_api_key_here
 MONGODB_CONNECTION_STRING=your_mongodb_connection_string_here
 ```
 
+## System Architecture
+
+### Data Flow Diagram
+
+```mermaid
+graph TD
+    A["📄 Input: PDF Document<br/>(from URL)"] --> B["Load PDF<br/>PyPDFLoader"]
+    B --> C["Split into Chunks<br/>RecursiveCharacterTextSplitter<br/>(400 chars, 20 overlap)"]
+    C --> D["Generate Embeddings<br/>OpenAI text-embedding-3-large<br/>(3072 dimensions)"]
+    D --> E["Store in MongoDB<br/>text + embedding"]
+    E --> F["Create Vector Index<br/>Cosine Similarity<br/>VectorSearch Index"]
+    
+    G["🔍 User Query"] --> H["Generate Query Embedding<br/>Same Model"]
+    H --> I["Vector Search<br/>Cosine Similarity<br/>Top K Results"]
+    I --> J["📊 Retrieved Documents<br/>Ranked by Relevance"]
+    
+    F -.->|indexed| I
+    E -.->|stored| I
+    
+    style A fill:#e1f5ff
+    style G fill:#fff3e0
+    style J fill:#e8f5e9
+    style F fill:#f3e5f5
+```
+
 ## Usage
 
 ### Running the Pipeline
